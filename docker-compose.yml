@@ -1,0 +1,21 @@
+nginx:
+  restart: always
+  image: docker-registry.ywqian.com:5000/suancloud/nginx4laravel
+  volumes_from:
+   - php
+  links:
+   - php
+php:
+  restart: always
+  container_name: shengxiang_api
+  image: docker-registry.ywqian.com:5000/suancloud/php-fpm:7.0-debug
+  volumes:
+   - .:/var/www/html
+  links:
+   - db
+db:
+  restart: always
+  container_name: shengxiang_db_1
+  image: docker-registry.ywqian.com:5000/library/mysql
+  environment:
+    MYSQL_ALLOW_EMPTY_PASSWORD: 1

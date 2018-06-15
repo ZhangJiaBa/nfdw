@@ -1,0 +1,135 @@
+<project name="jenkins-php" default="build" basedir=".">
+    <property name="basedir" value="${project.basedir}"/>
+    <property name="source" value="${basedir}/app"/>
+    <property name="tests" value="${basedir}/tests"/>
+    <!-- # of threads to execute parallel tasks -->
+    <property name="threads" value="2"/>
+
+    <target name="build" depends="clean, try_ParallelTasks, phpunit, phpdoc, -check-failure"/>
+
+    <target name="clean" description="Clean up and create artifact directories">
+        <delete dir="${basedir}/build/phpdox"/>
+        <delete dir="${basedir}/build/api"/>
+        <delete dir="${basedir}/build/coverage"/>
+        <delete dir="${basedir}/build/logs"/>
+        <delete dir="${basedir}/build/pdepend"/>
+
+        <mkdir dir="${basedir}/build/phpdox"/>
+        <mkdir dir="${basedir}/build/api"/>
+        <mkdir dir="${basedir}/build/coverage"/>
+        <mkdir dir="${basedir}/build/logs"/>
+        <mkdir dir="${basedir}/build/pdepend"/>
+    </target>
+
+    <target name="try_ParallelTasks"
+            description="Run the pdepend, phpmd, phpcpd, phpcs, phpdoc and phploc tasks. Checks for parallel support in PHP.">
+        <exec command="php -m | grep pcntl" returnProperty="pcntl_enabled"/>
+        <if>
+            <equals arg1="${pcntl_enabled}" arg2="pcntl"/>
+            <then>
+                <echo message="PCNTL Enabled. Running Taks in parallel with ${threads} threads."/>
+                <phingcall target="run_parallel_tasks"/>
+            </then>
+            <else>
+                <echo message="PCNTL is not enabled. Running task serially."/>
+                <phingcall target="run_serial_tasks"/>
+            </else>
+        </if>
+    </target>
+    <target name="run_parallel_tasks">
+        <parallel threadCount="${threads}">
+            <phingcall target="tasks_to_try"/>
+        </parallel>
+    </target>
+    <target name="run_serial_tasks">
+        <phingcall target="tasks_to_try"/>
+    </target>
+    <target name="tasks_to_try">
+        <phingcall target="phploc"/>
+        <phingcall target="pdepend"/>
+        <phingcall target="phpmd"/>
+        <phingcall target="phpcs"/>
+        <phingcall target="phpcpd"/>
+    </target>
+
+    <target name="lint" unless="lint.done" description="Perform syntax check of sourcecode files">
+        <apply executable="php">
+            <arg value="-l"/>
+
+            <fileset dir="${basedir}/src">
+                <include name="**/*.php"/>
+                <!--<modified />-->
+            </fileset>
+
+            <fileset dir="${basedir}/tests">
+                <include name="**/*.php"/>
+                <!--<modified />-->
+            </fileset>
+        </apply>
+
+        <!--<property name="lint.done" value="true"/>-->
+    </target>
+
+    <target name="pdepend" description="Generate jdepend.xml and software metrics charts using PHP_Depend">
+        <exec logoutput="true"
+              command="vendor/bin/pdepend
+              --jdepend-xml=${basedir}/build/logs/jdepend.xml
+              --jdepend-chart=${basedir}/build/pdepend/dependencies.svg
+              --overview-pyramid=${basedir}/build/pdepend/overview-pyramid.svg ${source}"/>
+    </target>
+
+    <target name="phpcpd" description="Generate pmd-cpd.xml using PHPCPD">
+        <exec logoutput="true"
+              command="vendor/bin/phpcpd
+              --log-pmd ${basedir}/build/logs/pmd-cpd.xml
+              ${source}"/>
+    </target>
+
+    <target name="phploc" description="Generate phploc.csv">
+        <exec logoutput="true"
+              command="vendor/bin/phploc
+              --count-tests
+              --log-csv ${basedir}/build/logs/phploc.csv
+              --log-xml ${basedir}/build/logs/phploc.xml
+              ${source}
+              ${tests}"/>
+    </target>
+
+    <target name="phpmd" description="Generate pmd.xml using PHPMD">
+        <exec logoutput="true"
+              command="vendor/bin/phpmd ${source}
+              xml ${basedir}/build/phpmd.xml
+              --reportfile ${basedir}/build/logs/pmd.xml"/>
+    </target>
+
+    <target name="phpcs" description="Generate checkstyle.xml using PHP_CodeSniffer">
+        <exec logoutput="true"
+              command="vendor/bin/phpcs --report=checkstyle
+              --report-file=${basedir}/build/logs/checkstyle.xml
+              --standard=PSR2
+              --extensions=php
+              --ignore=autoload.php
+              ${source}
+              ${tests}"/>
+    </target>
+
+    <target name="phpunit" description="Run unit tests using PHPUnit and generates junit.xml and clover.xml">
+        <exec logoutput="true" returnProperty="result.phpunit"
+              command="vendor/bin/phpunit" checkreturn="true"/>
+    </target>
+
+    <target name="phpdoc" description="Generate API documentation using PHPDocumentor">
+        <exec logoutput="true" command="vendor/bin/phpdox -f ${basedir}/build/phpdox.xml"/>
+    </target>
+
+    <target name="-check-failure">
+        <fail message="PHPUnit did not finish successfully">
+            <condition>
+                <not>
+                    <equals arg1="${result.phpunit}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
+    </target>
+
+</project>
