@@ -21,6 +21,8 @@ class CreateReportsTable extends Migration
             $table->string('employee')->nullable()->commet('员工基本表表');
             $table->string('update_log')->nullable()->commet('修正表');
             $table->string('car')->nullable()->commet('汽车基本表');
+            $table->string('began_time')->comment('开始时间');
+            $table->string('end_time')->comment('开始时间');
             $table->timestamps();
         });
 

@@ -45,4 +45,5 @@ Route::group(['namespace'=>"Backend\Index",'middleware'=>['web', 'guest']], func
     Route::post('system/store','SystemController@store');
     Route::resource('index','IndexController');
     Route::get('read/{id}','IndexController@read');
+    Route::get('count/{id}','IndexController@count');
 });
