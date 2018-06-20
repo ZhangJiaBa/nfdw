@@ -29,8 +29,14 @@ class IndexController extends Controller
             $grid->name('报表名称');
             $grid->actions(function ($actions) {
                 $key = $actions->getKey();
-                $actions->prepend("<a href='/read/" . $key . "' style='margin-right:10%;' >读取数据</a>");
-                $actions->prepend("<a href='/count/" . $key . "' style='margin-right:10%;' >生成报表</a>");
+                $hasRead = DB::table('reports')->where('id', $key)->first()->has_read;
+                if ($hasRead == 1)
+                {
+                    $actions->prepend("<a href='/count/" . $key . "' style='margin-right:10%;' >生成报表</a>");
+                }else
+                {
+                    $actions->prepend("<a href='/read/" . $key . "' style='margin-right:10%;' >读取数据</a>");
+                }
         });
     });
     }
@@ -54,13 +60,16 @@ class IndexController extends Controller
             $form->file('employee', "人员基本表")->move('/files', time().'emp.xlsx');
             $form->file('car_log', '车辆进出记录表')->move('/files', time().'car.xlsx');
             $form->file('people_log', '人员进出记录表')->move('/files', time().'peo.xlsx');
+            $form->hidden('has_read')->value(0);
             $form->save();
         });
     }
 
     public function read($id)
     {
-        $result = DB::table('reports')->where('id', $id)->select('car','employee', 'car_log','people_log', 'update_log')
+        DB::table('people_log')->delete();
+        DB::table('employee')->delete();
+        $result = DB::table('reports')->where('id', $id)->select('car','employee', 'car_log','people_log', 'update_log', 'id')
             ->get()->toArray();
         $ReadExcelService = app()->make('ReadExcelService');
         $ReadExcelService->ReadExcel($result[0]);

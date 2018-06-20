@@ -12,23 +12,35 @@ class ReadExcelService
 {
     public function ReadExcel($params)
     {
+        $result = 0;
+        DB::beginTransaction();
         foreach ($params as $key => $value)
         {
             switch ($key)
             {
                 case 'employee':
-                    $this->insertToEmployee($value);
+                    $result +=$this->insertToEmployee($value);
                     break;
                 case 'car':
-                    $this->insertToCar($value);
+                    $result +=$this->insertToCar($value);
                     break;
                 case 'people_log':
-                    $this->insertToPeopleLog($value);
+                    $result +=$this->insertToPeopleLog($value);
                     break;
                 case 'car_log':
-                    $this->insertToCarLog($value);
+                    $result +=$this->insertToCarLog($value);
                     break;
+                case 'id':
+                    $result +=$this->updateReport($value);
             }
+        }
+        if ($result =5)
+        {
+            DB::commit();
+        }
+        else
+        {
+            DB::rollBack();
         }
     }
 
@@ -46,7 +58,7 @@ class ReadExcelService
             $insert[$key]['name'] = $value[4];
             $insert[$key]['department'] = $value[7];
         }
-        DB::table('people_log')->insert($insert);
+        return DB::table('people_log')->insert($insert);
     }
 
     public function insertToCarLog($file_name)
@@ -64,7 +76,7 @@ class ReadExcelService
             $insert[$key]['name'] = $employee->name;
             $insert[$key]['department'] = $employee->department;
         }
-        DB::table('people_log')->insert($insert);
+        return DB::table('people_log')->insert($insert);
     }
 
     public function insertToEmployee($file_name)
@@ -77,7 +89,7 @@ class ReadExcelService
             $insert[$key]['name'] = $value[1];
             $insert[$key]['department'] = $value[2];
         }
-        DB::table('employee')->insert($insert);
+      return DB::table('employee')->insert($insert);
     }
 
     public function insertToCar($file_name)
@@ -91,7 +103,7 @@ class ReadExcelService
             $insert[$key]['name'] = $value[3];
             $insert[$key]['department'] = $value[1];
         }
-        DB::table('car')->insert($insert);
+        return DB::table('car')->insert($insert);
     }
 
     public function loadFile($file_name)
@@ -100,5 +112,10 @@ class ReadExcelService
         $reader->setReadDataOnly(true);
         $reader = $reader->load(storage_path('data/'.$file_name));
         return $reader->getActiveSheet()->toArray();
+    }
+
+    public function updateReport($id)
+    {
+        return DB::table('reports')->where('id', $id)->update(['has_read'=>1]);
     }
 }

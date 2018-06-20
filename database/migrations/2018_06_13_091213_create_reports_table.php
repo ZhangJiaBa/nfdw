@@ -23,6 +23,8 @@ class CreateReportsTable extends Migration
             $table->string('car')->nullable()->commet('汽车基本表');
             $table->string('began_time')->comment('开始时间');
             $table->string('end_time')->comment('开始时间');
+            $table->boolean('has_read')->comment('是否已经读取数据');
+            $table->string('report')->nullable()->comment('统计好的报表');
             $table->timestamps();
         });
 
@@ -37,7 +39,7 @@ class CreateReportsTable extends Migration
 
         Schema::create('employee', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name',50)->comment('名称');
+            $table->string('name',50);
             $table->string('department')->nullable()->commet('部门');
         });
 
