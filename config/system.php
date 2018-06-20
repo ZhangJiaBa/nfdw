@@ -12,26 +12,26 @@
 return [
 
 
-    'system' => env('SYSTEM', '检验检测机构信息管理系统'),
+    'system' => env('SYSTEM', '南方电网考勤管理系统'),
 
-    'company' => env('COMPANY', '广东盛翔交通工程检测有限公司'),
+    'company' => env('COMPANY', '南方电网'),
 
     'stamp' => env('STAMP', '511400'),
 
-    'telephone' => env('TEL', '020-38273450'),
+    'telephone' => env('TEL', ''),
 
-    'address' => env('ADDR', '广州市番禺区东环街番禺大道北1161号'),
+    'address' => env('ADDR', '广州市越秀区'),
 
-    'tax' => env('TAX', '020-38273450'),
+    'tax' => env('TAX', ''),
 
-    'e-mail' => env('E-MAIL', 'gdsxiang2015@163.com'),
+    'e-mail' => env('E-MAIL', ''),
 
-    'powered' => env('POWERED', '©广东盛翔版权所有'),
+    'powered' => env('POWERED', '©南方电网'),
 
     'version' => env('VERSION', app()->version()),
 
     'server' => env('SER', array_get($_SERVER, 'SERVER_SOFTWARE')),
 
-    'url' => env('URL', 'http://121.8.210.226:8080/lims/')
+    'url' => env('URL', '')
 
 ];

@@ -5,12 +5,12 @@ return [
     /*
      * Laravel-admin name.
      */
-    'name'      => '检验检测机构信息管理系统',
+    'name'      => '南方电网考勤管理系统',
 
     /*
      * Logo in admin panel header.
      */
-    'logo'      => '检验检测机构信息管理系统',
+    'logo'      => '南方电网考勤管理系统',
 
     /*
      * Mini-logo in admin panel header.
@@ -30,7 +30,7 @@ return [
     /*
      * Laravel-admin html title.
      */
-    'title'  => env('ADMIN_TITLE', '检验检测机构信息管理系统'),
+    'title'  => env('ADMIN_TITLE', '南方电网考勤管理系统'),
 
 
 
