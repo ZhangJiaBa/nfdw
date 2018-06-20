@@ -8,6 +8,7 @@
 namespace App\Services;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ReportService
 {
@@ -22,7 +23,7 @@ class ReportService
             $log[$value->name] = $emp_come;
             $times = array_map(function ($v) {return date('Y-m-d a', $v);}, $time_began_range['time_range']);
         }
-        $this->makeExcel($times, $log);
+        return $this->makeExcel($times, $log);
     }
 
     public function makeExcel($time, $log)
@@ -44,7 +45,7 @@ class ReportService
 
         }
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $file_name = time().'count';
+        $file_name = time();
         $writer->save(storage_path("data/files/$file_name.xlsx"));
         return response()->download(storage_path("data/files/$file_name.xlsx"));
     }

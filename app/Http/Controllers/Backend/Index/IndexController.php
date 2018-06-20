@@ -79,6 +79,6 @@ class IndexController extends Controller
     public function count($id)
     {
         $ReportService = app()->make('ReportService');
-        $ReportService->count($id);
+        return $ReportService->count($id);
     }
 }
