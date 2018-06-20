@@ -7,8 +7,6 @@
  */
 namespace App\Services;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
 
 class ReportService
 {
@@ -41,9 +39,11 @@ class ReportService
             }
             array_unshift($result,$key);
             $spreadsheet->getActiveSheet()->fromArray($result, NULL, 'A'.$i);
+            $indexes[] = $i;
             $i++;
-
         }
+        //添加统计数据
+        $spreadsheet = $this->addCountData($spreadsheet, $indexes, $i);
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $file_name = time();
         $writer->save(storage_path("data/files/$file_name.xlsx"));
@@ -54,12 +54,12 @@ class ReportService
     {
         //拿到所有时间段
         $report = DB::table('reports')->where('id', $id)->first();
-        $began_time = strtotime($report->began_time)+9.5*60*60;
-        $end_time = strtotime($report->end_time)+9.5*60*60;
+        $began_time = strtotime($report->began_time)+8.5*60*60;
+        $end_time = strtotime($report->end_time)+8.5*60*60;
         for ($began_time; $began_time <= $end_time; $began_time+=60*60*24)
         {
             $time['time_range'][]= intval($began_time);
-            $time['time_range'][]= intval($began_time+8.5*60*60);
+            $time['time_range'][]= intval($began_time+9*60*60);
         }
         return $time;
     }
@@ -130,5 +130,22 @@ class ReportService
     {
         $detail = $employee_log->where('name', $employee)->sortByDesc('time')->take(1)->toArray();
         return $detail;
+    }
+
+    public function addCountData($spreadsheet, $indexes, $i)
+    {
+        $count_title = ['月末统计','迟到', '旷工', '早退'];
+        $spreadsheet->getActiveSheet()->fromArray($count_title, NULL, 'A'.($i+1));
+        foreach ($indexes as $num => $index)
+        {
+            $spreadsheet->getActiveSheet()->setCellValue('A'.($i+$num+2),'=A'.$index);
+            $pValue_late = '=COUNTIF(B'.$index.':BI'.$index.',"迟到")';
+            $pValue_not_coming = '=COUNTIF(B'.$index.':BI'.$index.',"旷工")';
+            $pValue_leave_early = '=COUNTIF(B'.$index.':BI'.$index.',"提前下班")';
+            $spreadsheet->getActiveSheet()->setCellValue('B'.($i+$num+2),$pValue_late);
+            $spreadsheet->getActiveSheet()->setCellValue('C'.($i+$num+2),$pValue_not_coming);
+            $spreadsheet->getActiveSheet()->setCellValue('D'.($i+$num+2),$pValue_leave_early);
+        }
+        return $spreadsheet;
     }
 }
