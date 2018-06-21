@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\Index;
 
 use App\Models\Reports;
 use App\Http\Controllers\Controller;
+use App\Services\ReportService;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Controllers\ModelForm;
 use Encore\Admin\Grid;
@@ -32,7 +33,8 @@ class IndexController extends Controller
                 $hasRead = DB::table('reports')->where('id', $key)->first()->has_read;
                 if ($hasRead == 1)
                 {
-                    $actions->prepend("<a href='/count/" . $key . "' style='margin-right:10%;' >生成报表</a>");
+                   /* $actions->prepend("<a href='/count/" . $key . "' style='margin-right:10%;' >生成报表</a>");*/
+                    $actions->prepend("<a href='/count_from_dep/" . $key . "' style='margin-right:10%;' >生成部门报表</a>");
                 }else
                 {
                     $actions->prepend("<a href='/read/" . $key . "' style='margin-right:10%;' >读取数据</a>");
@@ -85,9 +87,36 @@ class IndexController extends Controller
         });
     }
 
-    public function count($id)
+    public function getTime($id)
     {
-        $ReportService = app()->make('ReportService');
-        return $ReportService->count($id);
+        $report = DB::table('reports')->where('id', $id)->first();
+        //拿到所有时间段
+        $began_time = strtotime($report->began_time)+8.5*60*60;
+        $end_time = strtotime($report->end_time)+8.5*60*60;
+        for ($began_time; $began_time <= $end_time; $began_time+=60*60*24)
+        {
+            $time['time_range'][]= intval($began_time);
+            $time['time_range'][]= intval($began_time+9*60*60);
+        }
+        return $time;
+    }
+
+    public function countWithDep($id)
+    {
+        $report = DB::table('reports')->where('id', $id)->first();
+        $time_list = $this->getTime($id);
+        $departments = $this->getDepartment();
+        $ReportService = new ReportService($report, $time_list, $departments);
+        return $ReportService->countFromEmp();
+    }
+
+    public function getDepartment()
+    {
+        $departments = DB::table('employee')->select('department')->get();
+        foreach ($departments->groupBy('department')->toArray() as $department => $value)
+        {
+            $result[] = $department;
+        }
+        return $result;
     }
 }

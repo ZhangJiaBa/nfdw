@@ -31,7 +31,7 @@
 <div class="login-box" style="width: 100%;margin-top: 250px;">
   <div class="login-logo">
     <a href="{{ admin_base_path('/') }}" style="color: #fff;"><b>{{config('admin.name')}}</b></a>
-    <p style="color: #fff;font-size: 14px;">Information management system for inspection and testing institutions</p>
+    <p style="color: #fff;font-size: 14px;"></p>
   </div>
   <!-- /.login-logo -->
   <div class="login-box-body" style="width: 500px;margin: 0 auto; background: rgba(0,0,0,0);">
