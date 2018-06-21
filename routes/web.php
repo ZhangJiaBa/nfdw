@@ -39,11 +39,12 @@ Route::group(['namespace'=>"Backend\Admin",'middleware'=>['web', 'guest']], func
 });
 
 Route::group(['namespace'=>"Backend\Index",'middleware'=>['web', 'guest']], function () {
-    /*Route::get('/','HomeController@Index');*/
+    Route::get('/','HomeController@Index');
     Route::get('system','SystemController@index');
     Route::get('system/edit','SystemController@edit');
     Route::post('system/store','SystemController@store');
-    Route::resource('/','IndexController');
+    //Route::resource('/','IndexController');
+    Route::resource('index','IndexController');
     Route::get('read/{id}','IndexController@read');
     Route::get('count/{id}','IndexController@count');
     Route::get('count_from_dep/{id}','IndexController@countWithDep');

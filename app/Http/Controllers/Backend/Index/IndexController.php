@@ -69,6 +69,7 @@ class IndexController extends Controller
 
     public function read($id)
     {
+        DB::table('car')->delete();
         DB::table('people_log')->delete();
         DB::table('employee')->delete();
         $result = DB::table('reports')->where('id', $id)->select('car','employee', 'car_log','people_log', 'update_log', 'id')

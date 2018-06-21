@@ -14,8 +14,10 @@ class ReadExcelService
     {
         $result = 0;
         DB::beginTransaction();
+        try{
         foreach ($params as $key => $value)
         {
+
             switch ($key)
             {
                 case 'employee':
@@ -32,8 +34,11 @@ class ReadExcelService
                     break;
                 case 'id':
                     $result +=$this->updateReport($value);
+            }}}
+            catch (\Exception $exception)
+            {
+                admin_toastr('读取数据失败,上传的文件不符合格式');
             }
-        }
         if ($result =5)
         {
             DB::commit();
