@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class ReadExcelService
 {
-    public function ReadExcel($params)
+    public function readExcel($params)
     {
         $result = 0;
         DB::beginTransaction();
