@@ -14,7 +14,6 @@ class ReadExcelService
     {
         $result = 0;
         DB::beginTransaction();
-        try{
         foreach ($params as $key => $value)
         {
 
@@ -34,17 +33,14 @@ class ReadExcelService
                     break;
                 case 'id':
                     $result +=$this->updateReport($value);
-            }}}
-            catch (\Exception $exception)
-            {
-                admin_toastr('读取数据失败,上传的文件不符合格式');
-            }
+            }}
         if ($result =5)
         {
             DB::commit();
         }
         else
         {
+            admin_toastr('表格式不符合');
             DB::rollBack();
         }
     }
@@ -54,15 +50,14 @@ class ReadExcelService
         $params = $this->loadFile($file_name);
         unset($params[0]);
         $insert = [];
-        foreach ($params as $key => $value)
-        {
-            $value[0] = ($value[0]-70*365-19)*86400-8*3600;
+        foreach ($params as $key => $value) {
+            $value[0] = ($value[0] - 70 * 365 - 19) * 86400 - 8 * 3600;
             $insert[$key]['time'] = $value[0];
             $insert[$key]['card'] = $value[1];
             $insert[$key]['door'] = $value[3];
             $insert[$key]['name'] = $value[4];
             $insert[$key]['department'] = $value[7];
-        }
+            }
         return DB::table('people_log')->insert($insert);
     }
 
@@ -71,13 +66,12 @@ class ReadExcelService
         $params = $this->loadFile($file_name);
         unset($params[0]);
         $insert = [];
-        foreach ($params as $key => $value)
-        {
+        foreach ($params as $key => $value) {
             $employee = DB::table('car')->where('car_num', $value[0])->first();
             $value[7] = strtotime($value[7]);
-            $value[3] = $value[3] == '入场'?'入口':'出口';
+            $value[5] = $value[5] == '入场' ? '入口' : '出口';
             $insert[$key]['time'] = $value[7];
-            $insert[$key]['door'] = $value[3];
+            $insert[$key]['door'] = $value[5];
             $insert[$key]['name'] = $employee->name;
             $insert[$key]['department'] = $employee->department;
         }
@@ -93,8 +87,9 @@ class ReadExcelService
         {
             $insert[$key]['name'] = $value[1];
             $insert[$key]['department'] = $value[2];
+
         }
-      return DB::table('employee')->insert($insert);
+        return DB::table('employee')->insert($insert);
     }
 
     public function insertToCar($file_name)

@@ -21,11 +21,11 @@ class HomeController extends Controller
             $content->description("");
 
             $content->row(function ($row) {
-                $row->column(3, new InfoBox('用户管理', 'users', 'aqua', '/users', '用户管理'));
+                /*$row->column(3, new InfoBox('用户管理', 'users', 'aqua', '/users', '用户管理'));
                 $row->column(3, new InfoBox('角色管理', 'shopping-cart', 'green', '/roles', '角色管理'));
                 $row->column(3, new InfoBox('权限管理', 'book', 'yellow', '/permissions', '权限管理'));
-                $row->column(3, new InfoBox('操作记录', 'file', 'red', '/logs', '操作记录'));
-                $row->column(3, new InfoBox('项目列表', 'users', 'aqua', '/project', '项目列表'));
+                $row->column(3, new InfoBox('操作记录', 'file', 'red', '/logs', '操作记录'));*/
+                $row->column(3, new InfoBox('考勤', 'users', 'aqua', '/index', '考勤'));
             });
 
         });
