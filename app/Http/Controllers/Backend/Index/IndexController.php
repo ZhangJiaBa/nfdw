@@ -27,6 +27,8 @@ class IndexController extends Controller
     public function grid()
     {
         return Reports::grid(function(Grid $grid) {
+            $grid->disableExport();
+            $grid->disableFilter();
             $grid->name('报表名称');
             $grid->actions(function ($actions) {
                 $key = $actions->getKey();
